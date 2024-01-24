@@ -3,6 +3,7 @@ const { secret } = require('../config');
 
 /*module.exports = (secret) => (req, resp, next) => {
   const { authorization } = req.headers;
+  const authorization = req.header.authorization
 
   if (!authorization) {
     return next();
@@ -31,8 +32,8 @@ module.exports.isAuthenticated = (req) => {
   //ROL === ADMIN
   //TOKEN VALIDO?
 
-  //console.log("REQ: ", req.headers);
-  const { authorization } = req.headers
+  console.log("REQ: ", req.headers);
+  const { authorization } = req.headers;
   //console.log("Autenticación: ", authorization);
   if (!authorization) {
     return false;
@@ -66,9 +67,10 @@ try {
 module.exports.isAdmin = (req) => {
   // TODO: Decide based on the request information whether the user is an admin
   //ADMINISTRADOR?
-  const { authorization } = req.headers
+  const { authorization } = req.headers; //sintaxis igual a const authorization = req.headers.authorization
 
   const [type, token] = authorization.split(' ');
+  
   const decodedToken = jwt.verify(token, secret);
   console.log('Token decodificado:', decodedToken);
 

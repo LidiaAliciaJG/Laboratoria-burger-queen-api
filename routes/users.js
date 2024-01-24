@@ -31,8 +31,8 @@ const initAdminUser = async (app, next) => {
     const usersCollection = db.collection('user');
 
     const adminUserExists = await usersCollection.findOne({
-      //email: adminEmail,
-      role: "admin",
+      email: adminEmail,
+      //role: "admin",
     });
 
     if (!adminUserExists) {
@@ -79,13 +79,15 @@ const initAdminUser = async (app, next) => {
 
 module.exports = (app, next) => {
 
-  app.get('/users', requireAdmin, getUsers);
+  //app.get('/users', requireAdmin, getUsers); //para pruebas de getUsers se puede borrar requireAdmin
+  app.get('/users', getUsers); 
 
   app.get('/users/:uid', requireAuth, (req, resp) => {
   });
 
   app.post('/users', requireAdmin, (req, resp, next) => {
     // TODO: Implement the route to add new users
+    
   });
 
   app.put('/users/:uid', requireAuth, (req, resp, next) => {

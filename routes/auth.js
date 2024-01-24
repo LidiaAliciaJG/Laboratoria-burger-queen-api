@@ -10,6 +10,7 @@ module.exports = (app, nextMain) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
+      //resp.send({ "error": "string" })
       return next(400);
     }
 
@@ -17,15 +18,15 @@ module.exports = (app, nextMain) => {
     try {
       const db = await connect();
       const collection = db.collection('user');
-    // It is necessary to confirm if the email and password match a user in the database
+      // It is necessary to confirm if the email and password match a user in the database
       const userValid = await collection.findOne({ email });
       console.log("Login del usuario: ", userValid)
       if (!userValid) {
         return next(401);
       }
       const authPassword = password === userValid.password   //await bcrypt.compare(password, userValid.password);
-      console.log("Password válida? "+authPassword)
-    // If they match, send an access token created with JWT
+      console.log("Password válida? " + authPassword)
+      // If they match, send an access token created with JWT
       if (authPassword) {
         const tokenIs = jwt.sign(
           {
@@ -37,11 +38,19 @@ module.exports = (app, nextMain) => {
           {
             expiresIn: '1h'
           }
-          );
-        console.log("Token creado: "+tokenIs);
-        resp.json({ token: tokenIs });
+        );
+        console.log("Token creado: " + tokenIs);
+        resp.json({
+          /*token: tokenIs */
+          "accessToken": tokenIs,
+          "user": {
+            "id": userValid._id,
+            "email": userValid.email,
+            "role": userValid.role
+          }
+        });
       } else {
-        next(400);
+        next(404);
       }
     } catch (error) {
       console.error("Error");
