@@ -6,7 +6,7 @@ const {
 } = require('../middleware/auth');
 
 const {
-  getUsers,
+  getUsers, postUsers
 } = require('../controller/users');
 
 const { connect } = require('../connect');
@@ -79,16 +79,53 @@ const initAdminUser = async (app, next) => {
 
 module.exports = (app, next) => {
 
-  //app.get('/users', requireAdmin, getUsers); //para pruebas de getUsers se puede borrar requireAdmin
-  app.get('/users', getUsers); 
+  app.get('/users', requireAdmin, getUsers);
+  //app.get('/users', getUsers); //para pruebas de getUsers se puede borrar requireAdmin
 
   app.get('/users/:uid', requireAuth, (req, resp) => {
   });
-
-  app.post('/users', requireAdmin, (req, resp, next) => {
+//CRUD-> UD
+  app.post('/users', requireAdmin, async (req, resp, next) => {
     // TODO: Implement the route to add new users
-    
+    //resp.send('NOT IMPLEMENTED: post users')
+    console.log("REQUEST POST USER: ", req.body);
+
+    const data = req.body;
+    //valores de rol o email, etc es valido? realmente un email? rol valido?
+    const addUser = {
+      email: data.email,
+      password: bcrypt.hashSync(data.password, 10),
+      role: data.role,
+    };
+
+    try {
+      const db = await connect()
+      const usersCollection = db.collection('user');
+
+      const addUserExists = await usersCollection.findOne({
+        email: data.email
+      });
+
+      if (!addUserExists) {
+        await usersCollection.insertOne(addUser);
+        //funcion en insert para devolver el id (simula find)
+        resp.send({
+          "id": addUser._id,
+          "email": addUser.email,
+          "role": addUser.role
+        })
+        console.log('usuario agregado');
+      } else {
+        console.log('El correo ya esta registrado: ', addUserExists);
+        next(403)
+      }
+    } catch (error) {
+      console.error(error);
+      next();
+    }
+
   });
+  //app.post('/users', requireAdmin, postUsers);
 
   app.put('/users/:uid', requireAuth, (req, resp, next) => {
   });

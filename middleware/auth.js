@@ -32,7 +32,7 @@ module.exports.isAuthenticated = (req) => {
   //ROL === ADMIN
   //TOKEN VALIDO?
 
-  console.log("REQ: ", req.headers);
+  //console.log("REQ: ", req.headers);
   const { authorization } = req.headers;
   //console.log("Autenticación: ", authorization);
   if (!authorization) {
@@ -72,7 +72,7 @@ module.exports.isAdmin = (req) => {
   const [type, token] = authorization.split(' ');
   
   const decodedToken = jwt.verify(token, secret);
-  console.log('Token decodificado:', decodedToken);
+  //console.log('Token decodificado:', decodedToken);
 
   console.log("TOKEN DE ADMIN? ", decodedToken.role=== 'admin');
   return decodedToken.role === 'admin';
