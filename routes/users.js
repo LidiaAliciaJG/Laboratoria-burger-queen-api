@@ -6,7 +6,7 @@ const {
 } = require('../middleware/auth');
 
 const {
-  getUsers, postUsers
+  getUsers, postUsers, getUser
 } = require('../controller/users');
 
 const { connect } = require('../connect');
@@ -78,14 +78,11 @@ const initAdminUser = async (app, next) => {
  */
 
 module.exports = (app, next) => {
+  //CRUD-> UD
 
-  app.get('/users', requireAdmin, getUsers);
-  //app.get('/users', getUsers); //para pruebas de getUsers se puede borrar requireAdmin
+  app.get('/users', requireAdmin, getUsers); //para pruebas de getUsers se puede borrar requireAdmin
 
-  app.get('/users/:uid', requireAuth, (req, resp) => {
-  });
-  
-//CRUD-> UD
+  app.get('/users/:uid', requireAuth, getUser);
 
   app.post('/users', requireAdmin, postUsers);
 

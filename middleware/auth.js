@@ -44,7 +44,7 @@ module.exports.isAuthenticated = (req) => {
     return false;
   }
 
-  console.log("Token: ", token);
+  //console.log("Token: ", token);
   
 /*if(token){
   jwt.verify(token, secret);
