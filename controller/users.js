@@ -20,30 +20,10 @@ module.exports = {
         "email": user.email,
         "role": user.role
       }))
-      resp.json(users)
+      resp.status(200).json(users)
       console.log('usuarios mostrados');
     } catch (error) {
-      next(401)
-    }
-  },
-
-  getUser: async (req, resp, next) => {
-    //resp.send('NOT IMPLEMENTED: GET one user by id')
-    //console.log(req.params.uid);
-    try {
-      const db = await connect();
-      const userCollection = db.collection('user');
-      const uid = req.params.uid
-      const userFind = await userCollection.findOne({ _id : new ObjectId(uid) }); //uid debe ser del mismo formato que la base de datos (mongodb maneja objectId)
-      const user = {
-        "id": userFind._id,
-        "email": userFind.email,
-        "role": userFind.role
-      }
-      resp.send(user)
-      console.log(`usuario de id:${uid} mostrado`);
-    } catch (error) {
-      next(400);
+      resp.json({ "error": error })
     }
   },
 
@@ -54,12 +34,12 @@ module.exports = {
     console.log("REQUEST POST USER: ", req.body);
     const { email, password, role } = req.body;
     if (!email || !password || !role) {
-      return next(400);
+      return resp.status(400).json({ "error" : "email, role or password is not provided"});
     }
     //ROLES : MESERO, JEFE DE COCINA, ADMIN
     const roleValid = ["waiter", "chef", "admin"];
     if (!roleValid.includes(role)) {
-      return next(400);
+      return resp.status(400).json({ "error" : "role is not valid"});
     }
 
     /*const emailAt = email.split("@")
@@ -73,8 +53,9 @@ module.exports = {
 
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     console.log("email valido: ", regexEmail.test(email));
+    //email minusculas y mayusculas como iguales
     if (!regexEmail.test(email)) {
-      return next(400);
+      return resp.status(400).json({ "error" : "email is not valid"});
     }
 
     const addUser = {
@@ -99,7 +80,7 @@ module.exports = {
         let getAddUser = await usersCollection.findOne({
           _id: getAddId
         });
-        resp.send({
+        resp.status(200).send({
           "id": getAddId, //addUser._id, -> se debe de obtener el id ya creado y guardado
           "email": getAddUser.email,//addUser.email,
           "role": getAddUser.role//addUser.role,
@@ -107,11 +88,94 @@ module.exports = {
         console.log('usuario agregado');
       } else {
         console.log('El correo ya esta registrado: ', addUserExists);
-        next(403)
+        resp.status(403).json({ "error" : "a user with that email already exists"});
       }
     } catch (error) {
       console.error(error);
-      next();
+    }
+  },
+
+  getUserUid: async (req, resp) => {
+    //resp.send('NOT IMPLEMENTED: GET one user by id')
+    //console.log(req);
+    try {
+      const db = await connect();
+      const userCollection = db.collection('user');
+      const uid = req.params.uid
+      console.log(uid);
+      /*const userFind = await userCollection.findOne({
+        $or: [ { email: uid }, { _id: new ObjectId(uid) } ]  //marca error por no ser un objeto válido
+      });*/
+      let userFind = ''
+      if (ObjectId.isValid(uid)) {
+        userFind = await userCollection.findOne({ _id: new ObjectId(uid) }); //uid debe ser del mismo formato que la base de datos (mongodb maneja objectId)
+      } else {
+        userFind = await userCollection.findOne({ email: uid });
+      }
+      const user = {
+        "id": userFind._id,
+        "email": userFind.email,
+        "role": userFind.role
+      }
+      resp.status(200).send(user)
+      console.log(`usuario de id/email:${uid} mostrado`);
+    } catch (error) {
+      console.error(error)
+      resp.status(404).send('user does not exist');
+    }
+  },
+
+  updateUserUid: async (req, resp, next) => {
+    //resp.send('NOT IMPLEMENTED: PUT/PATCH one user by id')
+    //console.log(req.params.uid, req.body);
+    try {
+      const db = await connect();
+      const userCollection = db.collection('user');
+
+      const { email, password, role } = req.body;
+      if (!email || !password || !role) {
+        return resp.status(400).json({ "error" : "email, role or password is not provided"});
+      }
+
+      const roleValid = ["waiter", "chef", "admin"];
+      if (!roleValid.includes(role)) {
+        return resp.status(400).json({ "error" : "role is not valid"});
+      }
+  
+      const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      console.log("email valido: ", regexEmail.test(email));
+      //email minusculas y mayusculas como iguales
+      if (!regexEmail.test(email)) {
+        return resp.status(400).json({ "error" : "email is not valid"});
+      }
+
+      const uid = req.params.uid
+      let userFind = ''
+      if (ObjectId.isValid(uid)) {
+        userFind = await userCollection.findOneAndUpdate(
+          { _id: new ObjectId(uid) },
+          { $set: { email, password, role } },
+          { returnDocument: 'after' }
+          );
+      } else {
+        userFind = await userCollection.findOneAndUpdate(
+          { email: uid },
+          { $set: { email, password, role } },
+          { returnDocument: 'after' }
+          );
+      }
+      console.log(`usuario de id/email:${uid} actualizado`);
+
+      const user = {
+        "id": userFind._id,
+        "email": userFind.email,
+        "role": userFind.role
+      }
+
+      resp.status(200).send(user)
+    } catch (error) {
+      console.error(error)
+      resp.status(404).send('user does not exist');
     }
   }
 };

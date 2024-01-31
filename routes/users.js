@@ -6,7 +6,7 @@ const {
 } = require('../middleware/auth');
 
 const {
-  getUsers, postUsers, getUser
+  getUsers, postUsers, getUserUid, updateUserUid
 } = require('../controller/users');
 
 const { connect } = require('../connect');
@@ -80,17 +80,17 @@ const initAdminUser = async (app, next) => {
 module.exports = (app, next) => {
   //CRUD-> UD
 
-  app.get('/users', requireAdmin, getUsers); //para pruebas de getUsers se puede borrar requireAdmin
+  app.get('/users', requireAdmin, getUsers); //DONE //para pruebas de getUsers se puede borrar requireAdmin
 
-  app.get('/users/:uid', requireAuth, getUser);
+  app.get('/users/:uid', requireAuth, getUserUid); //DONE
 
-  app.post('/users', requireAdmin, postUsers);
+  app.post('/users', requireAdmin, postUsers); //DONE
 
-  app.put('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.put('/users/:uid', requireAuth, updateUserUid); //DONE
 
   app.delete('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  }); //paso siguiente
 
+  //y finalmente probar las pruebas e2e (end to end)
   initAdminUser(app, next);
 };
