@@ -38,7 +38,8 @@ module.exports = {
     }
     //ROLES : MESERO, JEFE DE COCINA, ADMIN
     const roleValid = ["waiter", "chef", "admin"];
-    if (!roleValid.includes(role)) {
+    const roleLow = role.toLowerCase();
+    if (!roleValid.includes(roleLow)) {
       return resp.status(400).json({ "error" : "role is not valid"});
     }
 
@@ -52,16 +53,16 @@ module.exports = {
     }*/
 
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    console.log("email valido: ", regexEmail.test(email));
-    //email minusculas y mayusculas como iguales
-    if (!regexEmail.test(email)) {
+    const emailLow = email.toLowerCase(); //email minusculas y mayusculas como iguales
+    console.log("email valido: ", regexEmail.test(emailLow));
+    if (!regexEmail.test(emailLow)) {
       return resp.status(400).json({ "error" : "email is not valid"});
     }
 
     const addUser = {
-      email: email,
+      email: emailLow,
       password: bcrypt.hashSync(password, 10),
-      role: role,
+      role: roleLow,
     };
 
     try {
@@ -69,7 +70,7 @@ module.exports = {
       const usersCollection = db.collection('user');
 
       const addUserExists = await usersCollection.findOne({
-        email: email
+        email: emailLow
       });
 
       if (!addUserExists) {
@@ -110,7 +111,8 @@ module.exports = {
       if (ObjectId.isValid(uid)) {
         userFind = await userCollection.findOne({ _id: new ObjectId(uid) }); //uid debe ser del mismo formato que la base de datos (mongodb maneja objectId)
       } else {
-        userFind = await userCollection.findOne({ email: uid });
+        const uidEmail = uid.toLowerCase();
+        userFind = await userCollection.findOne({ email: uidEmail });
       }
       const user = {
         "id": userFind._id,
@@ -138,14 +140,16 @@ module.exports = {
       }
 
       const roleValid = ["waiter", "chef", "admin"];
-      if (!roleValid.includes(role)) {
+      const roleLow = role.toLowerCase();
+      if (!roleValid.includes(roleLow)) {
         return resp.status(400).json({ "error" : "role is not valid"});
       }
   
       const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      console.log("email valido: ", regexEmail.test(email));
+      const emailLow = email.toLowerCase();
+      console.log("email valido: ", regexEmail.test(emailLow));
       //email minusculas y mayusculas como iguales
-      if (!regexEmail.test(email)) {
+      if (!regexEmail.test(emailLow)) {
         return resp.status(400).json({ "error" : "email is not valid"});
       }
 
@@ -154,17 +158,46 @@ module.exports = {
       if (ObjectId.isValid(uid)) {
         userFind = await userCollection.findOneAndUpdate(
           { _id: new ObjectId(uid) },
-          { $set: { email, password, role } },
+          { $set: { emailLow, password, roleLow } },
           { returnDocument: 'after' }
           );
       } else {
+        const uidEmail = uid.toLowerCase();
         userFind = await userCollection.findOneAndUpdate(
-          { email: uid },
-          { $set: { email, password, role } },
+          { email: uidEmail },
+          { $set: { emailLow, password, roleLow } },
           { returnDocument: 'after' }
           );
       }
       console.log(`usuario de id/email:${uid} actualizado`);
+
+      const user = {
+        "id": userFind._id,
+        "email": userFind.email,
+        "role": userFind.role
+      }
+
+      resp.status(200).send(user)
+    } catch (error) {
+      console.error(error)
+      resp.status(404).send('user does not exist');
+    }
+  },
+
+  deleteUserUid: async (req, resp, next) => {
+    //resp.send('NOT IMPLEMENTED: DELETE one user by id')
+    try {
+      const db = await connect();
+      const userCollection = db.collection('user');
+
+      const uid = req.params.uid
+      let userFind = ''
+      if (ObjectId.isValid(uid)) {
+        userFind = await userCollection.findOneAndDelete({ _id: new ObjectId(uid) });
+      } else {
+        userFind = await userCollection.findOneAndDelete({ email: uid });
+      }
+      console.log(`usuario de id/email:${uid} eliminado`);
 
       const user = {
         "id": userFind._id,

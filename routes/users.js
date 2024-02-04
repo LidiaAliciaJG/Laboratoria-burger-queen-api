@@ -6,7 +6,7 @@ const {
 } = require('../middleware/auth');
 
 const {
-  getUsers, postUsers, getUserUid, updateUserUid
+  getUsers, postUsers, getUserUid, updateUserUid, deleteUserUid
 } = require('../controller/users');
 
 const { connect } = require('../connect');
@@ -88,8 +88,7 @@ module.exports = (app, next) => {
 
   app.put('/users/:uid', requireAuth, updateUserUid); //DONE
 
-  app.delete('/users/:uid', requireAuth, (req, resp, next) => {
-  }); //paso siguiente
+  app.delete('/users/:uid', requireAuth, deleteUserUid); //DONE
 
   //y finalmente probar las pruebas e2e (end to end)
   initAdminUser(app, next);
