@@ -6,7 +6,7 @@ const {
 } = require('../middleware/auth');
 
 const {
-  getUsers, postUsers, getUserUid, updateUserUid, deleteUserUid
+  getUsers, postUsers, getUserUid, updateUserUid, deleteUserUid,
 } = require('../controller/users');
 
 const { connect } = require('../connect');
@@ -20,26 +20,26 @@ const initAdminUser = async (app, next) => {
   const adminUser = {
     email: adminEmail,
     password: bcrypt.hashSync(adminPassword, 10),
-    role: "admin",
+    role: 'admin',
   };
 
   // TODO: Create admin user
   // First, check if adminUser already exists in the database
   // If it doesn't exist, it needs to be saved
   try {
-    const db = await connect()
+    const db = await connect();
     const usersCollection = db.collection('user');
 
     const adminUserExists = await usersCollection.findOne({
       email: adminEmail,
-      //role: "admin",
+      // role: "admin",
     });
 
     if (!adminUserExists) {
       await usersCollection.insertOne(adminUser);
     } else {
-      console.log('El  administrador ya existe: ');
-      console.log(adminUserExists);
+      // console.log('El  administrador ya existe: ');
+      // console.log(adminUserExists);
     }
 
     next();
@@ -78,18 +78,16 @@ const initAdminUser = async (app, next) => {
  */
 
 module.exports = (app, next) => {
-  //CRUD-> UD
+  app.get('/users', requireAdmin, getUsers); // DONE // para pruebas de getUsers se puede borrar requireAdmin
 
-  app.get('/users', requireAdmin, getUsers); //DONE //para pruebas de getUsers se puede borrar requireAdmin
+  app.get('/users/:uid', requireAuth, getUserUid); // DONE
 
-  app.get('/users/:uid', requireAuth, getUserUid); //DONE
+  app.post('/users', requireAdmin, postUsers); // DONE
 
-  app.post('/users', requireAdmin, postUsers); //DONE
+  app.put('/users/:uid', requireAuth, updateUserUid); // DONE
 
-  app.put('/users/:uid', requireAuth, updateUserUid); //DONE
+  app.delete('/users/:uid', requireAuth, deleteUserUid); // DONE
 
-  app.delete('/users/:uid', requireAuth, deleteUserUid); //DONE
-
-  //y finalmente probar las pruebas e2e (end to end)
+  // y finalmente probar las pruebas e2e (end to end)
   initAdminUser(app, next);
 };

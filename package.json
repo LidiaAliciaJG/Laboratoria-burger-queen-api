@@ -17,17 +17,17 @@
     "docs:deploy": "rm -rf docs && npm run docs:generate && gh-pages -d docs"
   },
   "dependencies": {
-    "@shelf/jest-mongodb": "^4.1.7",
+    "@shelf/jest-mongodb": "^4.2.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "6.3",
-    "mongodb-memory-server": "^8.12.2"
+    "mongodb-memory-server": "^8.16.0"
   },
   "devDependencies": {
     "docdash": "^1.2.0",
-    "eslint": "^8.3.0",
+    "eslint": "^8.56.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.22.1",
     "gh-pages": "^3.1.0",
@@ -35,6 +35,7 @@
     "jsdoc": "^3.6.6",
     "jsdoc-http-plugin": "^0.3.2",
     "node-fetch": "^3.1.0",
+    "supertest": "^6.3.4",
     "tree-kill": "^1.2.2"
   },
   "bootcamp": {
