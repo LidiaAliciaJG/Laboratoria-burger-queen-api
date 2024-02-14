@@ -21,16 +21,16 @@ module.exports = (app, nextMain) => {
       const collection = db.collection('user');
       // It is necessary to confirm if the email and password match a user in the database
       const userValid = await collection.findOne({ email });
-      // console.log('Login del usuario: ', userValid);
+      console.log('Login del usuario: ', userValid);
       if (!userValid) {
         return next(404);
       }
       // const authPassword = password === userValid.password;
       const authPassword = await bcrypt.compare(password, userValid.password);
-      // console.log('Password válida? ', authPassword);
+      console.log('Password válida? ', authPassword);
       // If they match, send an access token created with JWT
       if (authPassword) {
-        const tokenIs = jwt.sign(
+        const token = jwt.sign(
           {
             uid: userValid._id,
             email: userValid.email,
@@ -41,15 +41,15 @@ module.exports = (app, nextMain) => {
             expiresIn: '1h',
           },
         );
-        // console.log('Token creado: ', tokenIs);
-        resp.json({
-          token: tokenIs
-          /* accessToken: tokenIs,
-          user: {
+        console.log('Token creado: ', token);
+        resp.status(200).json({
+          //token: token
+          token: token,
+           user: {
             id: userValid._id,
             email: userValid.email,
             role: userValid.role,
-          },*/
+          },
         });
       } else {
         next(404);
