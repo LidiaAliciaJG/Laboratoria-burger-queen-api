@@ -20,7 +20,7 @@ module.exports = {
       // resp.json(userCollection) establece el encabezado Content-Type de la respuesta como json.
       // NO RETORNAR PASSWORD -> recorrer array y solo elegir ciertos datos:
       const users = userCollection.map((user) => ({
-        id: user._id,
+        _id: user._id,
         email: user.email,
         role: user.role,
       }));
@@ -66,6 +66,11 @@ module.exports = {
       return resp.status(400).json({ error: 'email is not valid' });
     }
 
+    //DEFINIR CRITERIOS DE VALIDACIÓN PARA PASSWORD
+    if (password.length<3) { 
+      return resp.status(400).json({ error: 'password is not valid' });
+    }
+
     const addUser = {
       email: emailLow,
       password: bcrypt.hashSync(password, 10),
@@ -79,6 +84,7 @@ module.exports = {
       const addUserExists = await usersCollection.findOne({
         email: emailLow,
       });
+
       console.log(addUserExists);
       if (!addUserExists) {
         console.log("dentro de adduserExist");
@@ -142,7 +148,7 @@ module.exports = {
         next(403);
       } else {
         const user = {
-          id: userFind._id,
+          _id: userFind._id,
           email: userFind.email,
           role: userFind.role,
         };
@@ -157,7 +163,7 @@ module.exports = {
 
   updateUserUid: async (req, resp, next) => {
     // resp.send('NOT IMPLEMENTED: PUT/PATCH one user by id')
-    // console.log(req.params.uid, req.body);
+    console.log(req.params.uid, req.body);
     try {
       const { authorization } = req.headers;
       const [type, token] = authorization.split(' ');
@@ -172,15 +178,15 @@ module.exports = {
       if (ObjectId.isValid(uid)) {
         userFind = await userCollection.findOne({ _id: new ObjectId(uid) });
       } else {
-        const uidEmail = uid.toLowerCase();
-        userFind = await userCollection.findOne({ email: uidEmail });
+        userFind = await userCollection.findOne({ email: uid.toLowerCase() });
       }
-      if (userFind._id !== uid || userFind.email !== uid || decodedToken.role !== 'admin') {
-        console.log("next 403");
+      const owner = userFind._id.equals(new ObjectId(decodedToken.uid));
+      const admin = decodedToken.role === 'admin';
+      console.log(userFind._id, new ObjectId(decodedToken.uid));
+      console.log(owner, admin);
+      if (!owner && !admin) {
         next(403);
       } else {
-
-
         const { email, password, role } = req.body;
         if (!email && !password && !role) {
           return resp.status(400).json({ error: 'email, role or password is not provided' });
@@ -190,13 +196,19 @@ module.exports = {
 
         if (password) {
           updateFields.password = bcrypt.hashSync(password, 10)
+          console.log(updateFields);
         }
 
         if (role) {
-          const roleValid = ['waiter', 'chef', 'admin'];
-          updateFields.role = role.toLowerCase();
-          if (!roleValid.includes(updateFields.role)) {
-            return resp.status(400).json({ error: 'role is not valid' });
+          if (!admin) {
+            console.log("no admin is changing role, error 403");
+            return resp.status(403).json("no admin is changing role, error 403")
+          } else {
+            const roleValid = ['waiter', 'chef', 'admin'];
+            updateFields.role = role.toLowerCase();
+            if (!roleValid.includes(updateFields.role)) {
+              return resp.status(400).json({ error: 'role is not valid' });
+            }
           }
         }
 
@@ -207,20 +219,31 @@ module.exports = {
             return resp.status(400).json({ error: 'email is not valid' });
           }
         }
-
-        userFind = await userCollection.findOneAndUpdate(
+        /*userFind = await userCollection.findOneAndUpdate(
           { $or: [{ _id: new ObjectId(uid) }, { email: uid.toLowerCase() }] },
           { $set: updateFields },
           { returnDocument: 'after' },
-        );
+        );*/
+        if (ObjectId.isValid(uid)) {
+          userFind = await userCollection.findOneAndUpdate(
+            { _id: new ObjectId(uid) },
+            { $set: updateFields },
+            { returnDocument: 'after' }
+            );
+        } else {
+          userFind = await userCollection.findOneAndUpdate(
+            { email: uid.toLowerCase() },
+            { $set: updateFields },
+            { returnDocument: 'after' }
+          );
+        }
         console.log(userFind);
 
         const user = {
-          id: userFind._id,
+          _id: userFind._id,
           email: userFind.email,
           role: userFind.role,
         };
-
         resp.status(200).json(user);
       }
     } catch (error) {
@@ -249,7 +272,7 @@ module.exports = {
         userFind = await userCollection.findOne({ email: uid.toLowerCase() });
         console.log(userFind);
       }
-      
+
       const owner = userFind._id.equals(new ObjectId(decodedToken.uid));
       const admin = decodedToken.role === 'admin';
       console.log(userFind._id, new ObjectId(decodedToken.uid));
@@ -266,7 +289,7 @@ module.exports = {
           console.log("email found and deleted");
         }
         const user = {
-          id: userFind._id,
+          _id: userFind._id,
           email: userFind.email,
           role: userFind.role,
         };
