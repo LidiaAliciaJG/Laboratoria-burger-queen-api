@@ -88,6 +88,6 @@ module.exports = (app, next) => {
 
   app.delete('/users/:uid', requireAuth, deleteUserUid); // DONE
 
-  // y finalmente probar las pruebas e2e (end to end)
+  // probar las pruebas e2e (end to end) DONE
   initAdminUser(app, next);
 };

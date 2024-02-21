@@ -12,10 +12,17 @@ module.exports = {
     // resp.send('NOT IMPLEMENTED: users collection')
 
     try {
+      
+      const { _limit, _page } = req.query;
+
+      const limit = parseInt(_limit) || 1;
+      const page = parseInt(_page) || 1;
+
       const db = await connect();
       const collection = db.collection('user');
+
       // const userCollection = await collection.find({ role: "user" }).toArray();
-      const userCollection = await collection.find().toArray(); // muestra todo user sin condiciones
+      const userCollection = await collection.find().limit(limit).toArray(); // muestra todo user sin condiciones
       // resp.send(userCollection) variará el Content-Type
       // resp.json(userCollection) establece el encabezado Content-Type de la respuesta como json.
       // NO RETORNAR PASSWORD -> recorrer array y solo elegir ciertos datos:
@@ -24,6 +31,8 @@ module.exports = {
         email: user.email,
         role: user.role,
       }));
+      // console.log(Array.isArray(users));
+      // console.log(Array.isArray({users}));
       resp.status(200).json(users);
       // console.log('usuarios mostrados');
     } catch (error) {

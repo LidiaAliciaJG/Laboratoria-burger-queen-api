@@ -1,14 +1,13 @@
+const { getProducts, getProductsUid } = require('../controller/products');
 const {
   requireAuth,
   requireAdmin,
 } = require('../middleware/auth');
 
 module.exports = (app, nextMain) => {
-  app.get('/products', requireAuth, (req, resp, next) => {
-  });
+  app.get('/products', requireAuth, getProducts);
 
-  app.get('/products/:productId', requireAuth, (req, resp, next) => {
-  });
+  app.get('/products/:productId', getProductsUid);
 
   app.post('/products', requireAdmin, (req, resp, next) => {
   });

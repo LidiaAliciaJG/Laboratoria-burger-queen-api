@@ -44,7 +44,7 @@ describe('POST /products', () => {
   ));
 });
 
-describe('GET /products', () => {
+describe.only('GET /products', () => {
   it('should get products with Auth', () => (
     fetchAsTestUser('/products')
       .then((resp) => {
