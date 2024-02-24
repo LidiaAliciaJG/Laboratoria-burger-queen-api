@@ -13,6 +13,7 @@ module.exports = (app, nextMain) => {
   app.put('/orders/:orderId', requireAuth, putOrders);
 
   app.delete('/orders/:orderId', requireAuth, (req, resp, next) => {
+    resp.send("DELETE NOT IMPLEMENTED")
   });
 
   nextMain();

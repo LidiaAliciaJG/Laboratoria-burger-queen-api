@@ -14,9 +14,11 @@ module.exports = (app, nextMain) => {
   //app.post('/products', requireAdmin, (req, resp, next) => { resp.send("ruta post product") });
 
   app.put('/products/:productId', requireAdmin, (req, resp, next) => {
+    resp.send("PUT NOT IMPLEMENTED")
   });
 
   app.delete('/products/:productId', requireAdmin, (req, resp, next) => {
+    resp.send("DELETE NOT IMPLEMENTED")
   });
 
   nextMain();

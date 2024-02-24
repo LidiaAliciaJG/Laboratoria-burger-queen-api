@@ -41,7 +41,7 @@ module.exports = {
   },
 
   postProducts: async (req, resp) => {
-    console.log("REQUEST POST PRODUCTS: ", req.body);
+    // console.log("REQUEST POST PRODUCTS: ", req.body);
     const { name, price, image, type } = req.body;
     if (!name || !price) {
       return resp.status(400).json({ error: 'name or price is not provided' });
@@ -52,23 +52,19 @@ module.exports = {
       price,
       image,
       type,
-      // dateEntry: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      dateEntry: new Date().toISOString().slice(0, 19).replace('T', ' '),
     };
 
     try {
       const db = await connect();
       const productCollection = db.collection('product');
 
-      const addProductExists = await productCollection.findOne({
-        name,
-      });
+      const addProductExists = await productCollection.findOne({ name });
 
       if (!addProductExists) {
         const result = await productCollection.insertOne(addProduct);
         const getAddId = result.insertedId;
-        const getAddProduct = await productCollection.findOne({
-          _id: getAddId,
-        });
+        const getAddProduct = await productCollection.findOne({ _id: getAddId });
         resp.status(200).json(getAddProduct);
       } else {
         resp.status(403).json({ error: 'a product with that name already exists' });

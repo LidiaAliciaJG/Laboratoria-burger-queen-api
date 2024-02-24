@@ -86,8 +86,8 @@ describe('GET /products/:productid', () => {
           expect(typeof product.image).toBe('string');
           expect(typeof product.type).toBe('string');
         });
-        // return fetchAsTestUser(`/products/${json[0]._id}`) original
-        return fetchAsTestUser(`/products/${json[0].productId}`)
+        return fetchAsTestUser(`/products/${json[0]._id}`) // original
+        // return fetchAsTestUser(`/products/${json[0].productId}`)
           .then((resp) => ({ resp, product: json[0] }));
       })
       .then(({ resp, product }) => {
