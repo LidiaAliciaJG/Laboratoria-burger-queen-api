@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const { connect } = require('../connect');
 const jwt = require('jsonwebtoken');
 const { secret } = require('../config');
-// const { isAdmin } = require('../middleware/auth');
 
 module.exports = {
   getUsers: async (req, resp) => {
@@ -45,7 +44,7 @@ module.exports = {
     // TODO: Implement the route to add new users
     // resp.send('NOT IMPLEMENTED: post users')
 
-    console.log("REQUEST POST USER: ", req.body);
+    // console.log("REQUEST POST USER: ", req.body);
     const { email, password, role } = req.body;
     if (!email || !password) {
       // if (!email || !password || !role) {
@@ -94,9 +93,9 @@ module.exports = {
         email: emailLow,
       });
 
-      console.log(addUserExists);
+      // console.log(addUserExists);
       if (!addUserExists) {
-        console.log("dentro de adduserExist");
+        // console.log("dentro de adduserExist");
         const result = await usersCollection.insertOne(addUser);
         // funcion en insert para devolver el id (simula find)
         // console.log(result);
@@ -104,7 +103,7 @@ module.exports = {
         const getAddUser = await usersCollection.findOne({
           _id: getAddId,
         });
-        console.log(getAddUser, getAddUser.role);
+        // console.log(getAddUser, getAddUser.role);
         resp.status(200).json({
           _id: getAddId, // addUser._id, -> se debe de obtener el id ya creado y guardado
           email: getAddUser.email, // addUser.email,
@@ -129,13 +128,13 @@ module.exports = {
       const { authorization } = req.headers;
       const [type, token] = authorization.split(' ');
       const decodedToken = jwt.verify(token, secret);
-      console.log("TOKEN DE ADMIN? ", decodedToken.role === 'admin');
-      console.log(decodedToken);
+      // console.log("TOKEN DE ADMIN? ", decodedToken.role === 'admin');
+      // console.log(decodedToken);
 
       const db = await connect();
       const userCollection = db.collection('user');
       const { uid } = req.params;
-      console.log(uid);
+      // console.log(uid);
       /* //marca error por no ser un objeto válido
       const userFind = await userCollection.findOne({
         $or: [ { email: uid }, { _id: new ObjectId(uid) } ]
@@ -150,10 +149,10 @@ module.exports = {
       }
       const owner = userFind._id.equals(new ObjectId(decodedToken.uid));
       const admin = decodedToken.role === 'admin';
-      console.log(userFind._id, new ObjectId(decodedToken.uid));
-      console.log(owner, admin);
+      // console.log(userFind._id, new ObjectId(decodedToken.uid));
+      // console.log(owner, admin);
       if (!owner && !admin) {
-        console.log("next 403");
+        // console.log("next 403");
         next(403);
       } else {
         const user = {
@@ -172,12 +171,12 @@ module.exports = {
 
   updateUserUid: async (req, resp, next) => {
     // resp.send('NOT IMPLEMENTED: PUT/PATCH one user by id')
-    console.log(req.params.uid, req.body);
+    // console.log(req.params.uid, req.body);
     try {
       const { authorization } = req.headers;
       const [type, token] = authorization.split(' ');
       const decodedToken = jwt.verify(token, secret);
-      console.log(decodedToken);
+      // console.log(decodedToken);
 
       const db = await connect();
       const userCollection = db.collection('user');
@@ -191,8 +190,8 @@ module.exports = {
       }
       const owner = userFind._id.equals(new ObjectId(decodedToken.uid));
       const admin = decodedToken.role === 'admin';
-      console.log(userFind._id, new ObjectId(decodedToken.uid));
-      console.log(owner, admin);
+      // console.log(userFind._id, new ObjectId(decodedToken.uid));
+      // console.log(owner, admin);
       if (!owner && !admin) {
         next(403);
       } else {
@@ -205,12 +204,12 @@ module.exports = {
 
         if (password) {
           updateFields.password = bcrypt.hashSync(password, 10)
-          console.log(updateFields);
+          // console.log(updateFields);
         }
 
         if (role) {
           if (!admin) {
-            console.log("no admin is changing role, error 403");
+            // console.log("no admin is changing role, error 403");
             return resp.status(403).json("no admin is changing role, error 403")
           } else {
             const roleValid = ['waiter', 'chef', 'admin'];
@@ -246,7 +245,7 @@ module.exports = {
             { returnDocument: 'after' }
           );
         }
-        console.log(userFind);
+        // console.log(userFind);
 
         const user = {
           _id: userFind._id,
@@ -267,7 +266,7 @@ module.exports = {
       const { authorization } = req.headers;
       const [type, token] = authorization.split(' ');
       const decodedToken = jwt.verify(token, secret);
-      console.log(decodedToken);
+      // console.log(decodedToken);
 
       const db = await connect();
       const userCollection = db.collection('user');
@@ -276,26 +275,26 @@ module.exports = {
       let userFind = '';
       if (ObjectId.isValid(uid)) {
         userFind = await userCollection.findOne({ _id: new ObjectId(uid) });
-        console.log(userFind);
+        // console.log(userFind);
       } else {
         userFind = await userCollection.findOne({ email: uid.toLowerCase() });
-        console.log(userFind);
+        // console.log(userFind);
       }
 
       const owner = userFind._id.equals(new ObjectId(decodedToken.uid));
       const admin = decodedToken.role === 'admin';
-      console.log(userFind._id, new ObjectId(decodedToken.uid));
-      console.log(owner, admin);
+      // console.log(userFind._id, new ObjectId(decodedToken.uid));
+      // console.log(owner, admin);
       if (!owner && !admin) {
-        console.log("next 403");
+        // console.log("next 403");
         next(403);
       } else {
         if (ObjectId.isValid(uid)) {
           userFind = await userCollection.findOneAndDelete({ _id: new ObjectId(uid) });
-          console.log("uid found and deleted");
+          // console.log("uid found and deleted");
         } else {
           userFind = await userCollection.findOneAndDelete({ email: uid.toLowerCase() });
-          console.log("email found and deleted");
+          // console.log("email found and deleted");
         }
         const user = {
           _id: userFind._id,

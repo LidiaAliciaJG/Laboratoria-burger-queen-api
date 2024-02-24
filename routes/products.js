@@ -1,4 +1,4 @@
-const { getProducts, getProductsUid } = require('../controller/products');
+const { getProducts, getProductsUid, postProducts } = require('../controller/products');
 const {
   requireAuth,
   requireAdmin,
@@ -7,9 +7,11 @@ const {
 module.exports = (app, nextMain) => {
   app.get('/products', requireAuth, getProducts);
 
-  app.get('/products/:productId', getProductsUid);
+  //app.get('/products/:productId', requireAuth, getProductsUid);
 
-  app.post('/products', requireAdmin, (req, resp, next) => {
+  //app.post('/products', requireAdmin, postProducts);
+  app.post('/products', (req, resp, next) => {
+    resp.send("ruta post product")
   });
 
   app.put('/products/:productId', requireAdmin, (req, resp, next) => {
