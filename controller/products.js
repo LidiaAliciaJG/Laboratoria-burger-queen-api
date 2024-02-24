@@ -40,7 +40,7 @@ module.exports = {
     }
   },
 
-  /*postProducts: async (req, resp) => {
+  postProducts: async (req, resp) => {
     console.log("REQUEST POST PRODUCTS: ", req.body);
     const { name, price, image, type } = req.body;
     if (!name || !price) {
@@ -76,5 +76,5 @@ module.exports = {
     } catch (error) {
       console.error(error);
     }
-  },*/
+  }
 };
