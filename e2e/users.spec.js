@@ -38,8 +38,8 @@ describe('GET /users', () => {
         expect(resp.status).toBe(200);
         return resp.json();
       })
-      // .then((json) => {
-      .then(({ json }) => {
+      .then((json) => {
+      // .then(({ json }) => {
         expect(Array.isArray(json)).toBe(true);
         expect(json.length).toBe(1);
         expect(json[0]).toHaveProperty('_id');

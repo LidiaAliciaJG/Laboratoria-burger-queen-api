@@ -82,27 +82,35 @@ module.exports = {
       const { orderId } = req.params;
       let orderFind = '';
 
-        const { status } = req.body;
-        if (!status) {
-          return resp.status(400).json({ error: 'status is not provided' });
-        }
+      if (!req.body) {
+        return resp.status(400).json({ error: 'any information is provided' });
+      }
 
-        const updateFields = {
-          status,
-          dateProcessed: new Date().toISOString().slice(0, 19).replace('T', ' '),
-        };
+      const { status } = req.body;
+      if (!status) {
+        return resp.status(400).json({ error: 'status is not provided' });
+      }
+      const statusValid = ['pending', 'canceled', 'delivering', 'delivered'];
+      if (!statusValid.includes(status)) {
+        return resp.status(404).json({ error: 'status is not valid' });
+      }
 
-        if (ObjectId.isValid(orderId)) {
-          orderFind = await orderCollection.findOneAndUpdate(
-            { _id: new ObjectId(orderId) },
-            { $set: updateFields },
-            { returnDocument: 'after' }
-          );
+      const updateFields = {
+        status,
+        dateProcessed: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      };
 
-          resp.status(200).json(orderFind);
-        } else {
-          resp.status(404).json('error');
-        }
+      if (ObjectId.isValid(orderId)) {
+        orderFind = await orderCollection.findOneAndUpdate(
+          { _id: new ObjectId(orderId) },
+          { $set: updateFields },
+          { returnDocument: 'after' }
+        );
+
+        resp.status(200).json(orderFind);
+      } else {
+        resp.status(404).json('order does not exist');
+      }
     } catch (error) {
       resp.status(404).send('order does not exist');
     }
