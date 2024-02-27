@@ -1,4 +1,4 @@
-const { getProducts, getProductsUid, postProducts } = require('../controller/products');
+const { getProducts, getProductsUid, postProducts, deleteProduct } = require('../controller/products');
 const {
   requireAuth,
   requireAdmin,
@@ -17,9 +17,7 @@ module.exports = (app, nextMain) => {
     resp.send("PUT NOT IMPLEMENTED")
   });
 
-  app.delete('/products/:productId', requireAdmin, (req, resp, next) => {
-    resp.send("DELETE NOT IMPLEMENTED")
-  });
+  app.delete('/products/:productId', requireAdmin, deleteProduct);
 
   nextMain();
 };

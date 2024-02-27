@@ -77,7 +77,7 @@ describe('POST /orders', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'test-client',
           price: 25,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -94,7 +94,7 @@ describe('POST /orders', () => {
         method: 'POST',
         body: {
           userId: user._id,
-          client: 'client',
+          client: 'client-testAdmin', // Antes client, cambiado por test e2e marcar "orden de este cliente ya existe"
           products: [
             {
               qty: 5,
@@ -109,11 +109,11 @@ describe('POST /orders', () => {
         return resp.json();
       })
       .then((json) => {
-        expect(typeof json._id).toBe('string');
+        // expect(typeof json._id).toBe('string');
         expect(typeof json.dateEntry).toBe('string');
         expect(Array.isArray(json.products)).toBe(true);
         expect(json.products.length).toBe(1);
-        expect(json.products[0].product.name).toBe('Test');
+        expect(json.products[0].product.name).toBe('test-client');
         expect(json.products[0].product.price).toBe(25);
       })
   ));

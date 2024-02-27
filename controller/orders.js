@@ -1,11 +1,35 @@
-const { connect } = require('../connect');
 const { ObjectId } = require('mongodb');
+const { connect } = require('../connect');
+const jwt = require('jsonwebtoken');
+const { secret } = require('../config');
 
 module.exports = {
   postOrders: async (req, resp, next) => {
     // resp.send("POST IMPLEMENTED");
     // console.log(req.body);
     const { userId, client, products, status } = req.body;
+
+    if (!req.body || !userId || !client || !products || !status) {
+      return resp.status(400).json({ error: 'no enought information' });
+    }
+
+    const statusValid = ['pending', 'canceled', 'delivering', 'delivered'];
+    if (!statusValid.includes(status)) {
+      return resp.status(400).json({ error: 'status is not valid' });
+    }
+
+    const { authorization } = req.headers;
+    const [type, token] = authorization.split(' ');
+    const decodedToken = jwt.verify(token, secret);
+    console.log("Toke info:", decodedToken);
+
+    const userValid = decodedToken.uid;
+    const loginRole = decodedToken.role
+    console.log("userValid:", userValid, "userId", userId);
+    console.log(userValid != userId, loginRole != 'admin');
+    if (userValid != userId && loginRole != 'admin') {
+      return resp.status(400).json({ error: 'login user and userId is not same or no admin' });
+    }
 
     const addOrder = {
       userId,
