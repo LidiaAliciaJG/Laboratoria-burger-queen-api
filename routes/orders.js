@@ -1,4 +1,4 @@
-const { getOrders, getOrderUid, postOrders, putOrders } = require('../controller/orders');
+const { getOrders, getOrderUid, postOrders, putOrders, deleteOrders } = require('../controller/orders');
 const {
   requireAuth,
 } = require('../middleware/auth');
@@ -12,9 +12,7 @@ module.exports = (app, nextMain) => {
 
   app.put('/orders/:orderId', requireAuth, putOrders);
 
-  app.delete('/orders/:orderId', requireAuth, (req, resp, next) => {
-    resp.send("DELETE NOT IMPLEMENTED")
-  });
+  app.delete('/orders/:orderId', requireAuth, deleteOrders);
 
   nextMain();
 };

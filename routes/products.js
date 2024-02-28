@@ -1,4 +1,4 @@
-const { getProducts, getProductsUid, postProducts, deleteProduct } = require('../controller/products');
+const { getProducts, getProductsUid, postProducts, deleteProduct, putProducts } = require('../controller/products');
 const {
   requireAuth,
   requireAdmin,
@@ -13,9 +13,7 @@ module.exports = (app, nextMain) => {
   app.post('/products', requireAdmin, postProducts);
   //app.post('/products', requireAdmin, (req, resp, next) => { resp.send("ruta post product") });
 
-  app.put('/products/:productId', requireAdmin, (req, resp, next) => {
-    resp.send("PUT NOT IMPLEMENTED")
-  });
+  app.put('/products/:productId', requireAdmin, putProducts);
 
   app.delete('/products/:productId', requireAdmin, deleteProduct);
 

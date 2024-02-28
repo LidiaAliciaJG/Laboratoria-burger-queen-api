@@ -30,7 +30,7 @@ describe('POST /orders', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'Test-post-UserAsUser',
           price: 10,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -47,7 +47,7 @@ describe('POST /orders', () => {
         method: 'POST',
         body: {
           userId: user._id,
-          client: 'client',
+          client: 'client-post-UserAsUser',
           products: [
             {
               qty: 5,
@@ -63,11 +63,11 @@ describe('POST /orders', () => {
       })
       .then((json) => {
         expect(typeof json._id).toBe('string');
-        expect(json.client).toBe('client');
+        expect(json.client).toBe('client-post-UserAsUser');
         expect(typeof json.dateEntry).toBe('string');
         expect(Array.isArray(json.products)).toBe(true);
         expect(json.products.length).toBe(1);
-        expect(json.products[0].product.name).toBe('Test');
+        expect(json.products[0].product.name).toBe('Test-post-UserAsUser');
         expect(json.products[0].product.price).toBe(10);
       })
   ));
@@ -130,7 +130,7 @@ describe('GET /orders', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'test-get-productUser',
           price: 10,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -149,7 +149,7 @@ describe('GET /orders', () => {
             method: 'POST',
             body: {
               userId: user._id,
-              client: 'client',
+              client: 'client-getOrdersUser-1',
               products: [
                 {
                   qty: 50,
@@ -163,7 +163,7 @@ describe('GET /orders', () => {
             method: 'POST',
             body: {
               userId: user._id,
-              client: 'client',
+              client: 'client-getOrdersUser-2',
               products: [
                 {
                   qty: 25,
@@ -201,7 +201,7 @@ describe('GET /orders', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'test-get-productAdmin',
           price: 10,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -220,7 +220,7 @@ describe('GET /orders', () => {
             method: 'POST',
             body: {
               userId: user._id,
-              client: 'client',
+              client: 'client-getOrdersAdmin-1',
               products: [
                 {
                   qty: 50,
@@ -234,7 +234,7 @@ describe('GET /orders', () => {
             method: 'POST',
             body: {
               userId: user._id,
-              client: 'client',
+              client: 'client-getOrdersAdmin-2',
               products: [
                 {
                   qty: 25,
@@ -284,7 +284,7 @@ describe('GET /orders/:orderId', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'test-getId-user',
           price: 99,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -301,7 +301,7 @@ describe('GET /orders/:orderId', () => {
         method: 'POST',
         body: {
           userId: user._id,
-          client: 'client',
+          client: 'client-getId-user',
           products: [
             {
               qty: 50,
@@ -322,7 +322,7 @@ describe('GET /orders/:orderId', () => {
       })
       .then((json) => {
         expect(json.products.length).toBe(1);
-        expect(json.products[0].product.name).toBe('Test');
+        expect(json.products[0].product.name).toBe('test-getId-user');
         expect(json.products[0].product.price).toBe(99);
       })
   ));
@@ -332,8 +332,8 @@ describe('GET /orders/:orderId', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
-          price: 99,
+          name: 'test-getId-Admin',
+          price: 10,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
         },
@@ -349,7 +349,7 @@ describe('GET /orders/:orderId', () => {
         method: 'POST',
         body: {
           userId: user._id,
-          client: 'client',
+          client: 'client-getId-Admin',
           products: [
             {
               qty: 50,
@@ -370,7 +370,7 @@ describe('GET /orders/:orderId', () => {
       })
       .then((json) => {
         expect(json.products.length).toBe(1);
-        expect(json.products[0].product.name).toBe('Test');
+        expect(json.products[0].product.name).toBe('test-getId-Admin');
         expect(json.products[0].product.price).toBe(10);
       })
   ));
@@ -385,7 +385,7 @@ describe('PUT /orders/:orderId', () => {
   it('should fail with 404 when not found', () => (
     fetchAsAdmin('/orders/xxx', {
       method: 'PUT',
-      body: { state: 'canceled' },
+      body: { status: 'canceled' }, // se cambió "state" por status, palabra usada en general
     })
       .then((resp) => expect(resp.status).toBe(404))
   ));
@@ -395,7 +395,7 @@ describe('PUT /orders/:orderId', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'test-putId-Props',
           price: 99,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -412,7 +412,7 @@ describe('PUT /orders/:orderId', () => {
         method: 'POST',
         body: {
           userId: user._id,
-          client: 'client',
+          client: 'client-putId-Props',
           products: [
             {
               qty: 50,
@@ -437,7 +437,7 @@ describe('PUT /orders/:orderId', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'Test-putId-status',
           price: 99,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -454,7 +454,7 @@ describe('PUT /orders/:orderId', () => {
         method: 'POST',
         body: {
           userId: user._id,
-          client: 'client',
+          client: 'client-putId-status',
           products: [
             {
               qty: 50,
@@ -480,7 +480,7 @@ describe('PUT /orders/:orderId', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'Test-upId-statusPreparing',
           price: 99,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -497,7 +497,7 @@ describe('PUT /orders/:orderId', () => {
         method: 'POST',
         body: {
           userId: user._id,
-          client: 'client',
+          client: 'client-putId-statusPreparing',
           products: [
             {
               qty: 50,
@@ -522,7 +522,7 @@ describe('PUT /orders/:orderId', () => {
         expect(resp.status).toBe(200);
         return resp.json();
       })
-      .then((json) => expect(json.status).toBe('preparing'))
+      .then((json) => expect(json.status).toBe('preparing')) // preparing no entra en la documentación de status validos
   ));
 
   it('should update order (set status to delivering)', () => (
@@ -530,7 +530,7 @@ describe('PUT /orders/:orderId', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'Test-putId-statusDelivering',
           price: 99,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -547,7 +547,7 @@ describe('PUT /orders/:orderId', () => {
         method: 'POST',
         body: {
           userId: user._id,
-          client: 'client',
+          client: 'client-putId-statusDelivering',
           products: [
             {
               qty: 50,
@@ -580,7 +580,7 @@ describe('PUT /orders/:orderId', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'Test-putId-statusDelivered',
           price: 99,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -597,7 +597,7 @@ describe('PUT /orders/:orderId', () => {
         method: 'POST',
         body: {
           userId: user._id,
-          client: 'client',
+          client: 'client-putId-statusDelivered',
           products: [
             {
               qty: 50,
@@ -645,7 +645,7 @@ describe('DELETE /orders/:orderId', () => {
       fetchAsAdmin('/products', {
         method: 'POST',
         body: {
-          name: 'Test',
+          name: 'Test-deleteOrder',
           price: 99,
           image: 'https://github.com/Laboratoria/bootcamp/tree/main/projects/04-burger-queen-api/resources/images/water.jpg',
           type: 'Lunch',
@@ -662,7 +662,7 @@ describe('DELETE /orders/:orderId', () => {
         method: 'POST',
         body: {
           userId: user._id,
-          client: 'client',
+          client: 'client-deleteOrder',
           products: [
             {
               qty: 50,

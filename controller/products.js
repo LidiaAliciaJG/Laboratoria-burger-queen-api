@@ -28,7 +28,7 @@ module.exports = {
         const result = await productCollection.insertOne(addProduct);
         const getAddId = result.insertedId;
         const getAddProduct = await productCollection.findOne({ _id: getAddId });
-        console.log(typeof getAddProduct._id, typeof getAddProduct.name, typeof getAddProduct.price, typeof getAddProduct.image, typeof getAddProduct.type);
+        // console.log(typeof getAddProduct._id, typeof getAddProduct.name, typeof getAddProduct.price, typeof getAddProduct.image, typeof getAddProduct.type);
         resp.status(200).json(getAddProduct);
       } else {
         resp.status(403).json({ error: 'a product with that name already exists' });
@@ -37,7 +37,7 @@ module.exports = {
       console.error(error);
     }
   },
-  
+
   getProducts: async (req, resp, next) => {
     try {
       // console.log("GET IMPLEMENTED");
@@ -53,12 +53,12 @@ module.exports = {
 
   getProductsUid: async (req, resp, next) => {
     // resp.send('GET one product by id IMPLEMENTED')
-    console.log(req.params);
+    // console.log(req.params);
     try {
       const db = await connect();
       const productCollection = db.collection('product');
       const { productId } = req.params;
-      console.log(productId);
+      // console.log(productId);
       let productFind = '';
       if (ObjectId.isValid(productId)) {
         productFind = await productCollection.findOne({ _id: new ObjectId(productId) });
@@ -74,16 +74,16 @@ module.exports = {
       console.error(error);
       resp.status(404).send('product does not exist');
     }
-  }, 
+  },
 
   deleteProduct: async (req, resp, next) => {
     // resp.send("DELETE NOT IMPLEMENTED")
-    console.log(req.params);
+    // console.log(req.params);
     try {
       const db = await connect();
       const productCollection = db.collection('product');
       const { productId } = req.params;
-      console.log(productId);
+      // console.log(productId);
       let productFind = '';
       if (ObjectId.isValid(productId)) {
         productFind = await productCollection.findOneAndDelete({ _id: new ObjectId(productId) });
@@ -97,6 +97,56 @@ module.exports = {
       }
     } catch (error) {
       console.error(error);
+      resp.status(404).send('product does not exist');
+    }
+  },
+
+  putProducts: async (req, resp, next) => {
+    // resp.send("PUT IMPLEMENTED");
+    // console.log(req.params.productId, req.body);
+    try {
+      const db = await connect();
+      const productCollection = db.collection('product');
+      const { productId } = req.params;
+      let productFind = '';
+
+      if (!req.body) {
+        return resp.status(400).json({ error: 'any information is provided' });
+      }
+
+      if (req.body.status) {
+        const statusValid = ['pending', 'canceled', 'preparing', 'delivering', 'delivered'];
+        if (!statusValid.includes(req.body.status)) {
+          return resp.status(400).json({ error: 'status is not valid' });
+          // return resp.status(404).json({ error: 'status is not valid' });
+        }
+      }
+
+      if (req.body.price) {
+        // console.log(typeof req.body.price != 'number');
+        if (typeof req.body.price != 'number') {
+          return resp.status(400).json({ error: 'price is not valid' });
+        }
+      }
+
+      const updateFields = {
+        ...req.body, // operador 'spread' para traer todos los campos de req.body
+        dateProcessed: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      };
+      /* req.body.dateProcessed = new Date().toISOString().slice(0, 19).replace('T', ' ')
+      const updateFields = req.body */
+
+      if (ObjectId.isValid(productId)) {
+        productFind = await productCollection.findOneAndUpdate(
+          { _id: new ObjectId(productId) },
+          { $set: updateFields },
+          { returnDocument: 'after' }
+        );
+        resp.status(200).json(productFind);
+      } else {
+        resp.status(404).json('product does not exist');
+      }
+    } catch (error) {
       resp.status(404).send('product does not exist');
     }
   }

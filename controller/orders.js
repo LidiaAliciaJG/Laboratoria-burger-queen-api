@@ -21,12 +21,12 @@ module.exports = {
     const { authorization } = req.headers;
     const [type, token] = authorization.split(' ');
     const decodedToken = jwt.verify(token, secret);
-    console.log("Toke info:", decodedToken);
+    // console.log("Toke info:", decodedToken);
 
     const userValid = decodedToken.uid;
     const loginRole = decodedToken.role
-    console.log("userValid:", userValid, "userId", userId);
-    console.log(userValid != userId, loginRole != 'admin');
+    // console.log("userValid:", userValid, "userId", userId);
+    // console.log(userValid != userId, loginRole != 'admin');
     if (userValid != userId && loginRole != 'admin') {
       return resp.status(400).json({ error: 'login user and userId is not same or no admin' });
     }
@@ -77,29 +77,29 @@ module.exports = {
     // console.log(req.params);
     try {
       const db = await connect();
-      const productCollection = db.collection('order');
-      const { productId } = req.params;
-      // console.log(productId);
-      let productFind = '';
-      if (ObjectId.isValid(productId)) {
-        productFind = await productCollection.findOne({ _id: new ObjectId(productId) });
+      const orderCollection = db.collection('order');
+      const { orderId } = req.params;
+      // console.log(orderId);
+      let orderFind = '';
+      if (ObjectId.isValid(orderId)) {
+        orderFind = await orderCollection.findOne({ _id: new ObjectId(orderId) });
       } else {
-        productFind = await productCollection.findOne({ name: { $regex: productId, $options: 'i' } });
+        orderFind = await orderCollection.findOne({ name: { $regex: orderId, $options: 'i' } });
       }
-      if (!productFind) {
-        resp.status(404).json('product not found');
+      if (!orderFind) {
+        resp.status(404).json('order not found');
       } else {
-        resp.status(200).json(productFind);
+        resp.status(200).json(orderFind);
       }
     } catch (error) {
       console.error(error);
-      resp.status(404).send('product does not exist');
+      resp.status(404).send('order does not exist');
     }
   },
 
   putOrders: async (req, resp, next) => {
     // resp.send("PUT IMPLEMENTED");
-    console.log(req.params.orderId, req.body);
+    // console.log(req.params.orderId, req.body);
     try {
       const db = await connect();
       const orderCollection = db.collection('order');
@@ -114,9 +114,10 @@ module.exports = {
       if (!status) {
         return resp.status(400).json({ error: 'status is not provided' });
       }
-      const statusValid = ['pending', 'canceled', 'delivering', 'delivered'];
+      const statusValid = ['pending', 'canceled', 'preparing', 'delivering', 'delivered'];
       if (!statusValid.includes(status)) {
-        return resp.status(404).json({ error: 'status is not valid' });
+        return resp.status(400).json({ error: 'status is not valid' });
+        // return resp.status(404).json({ error: 'status is not valid' });
       }
 
       const updateFields = {
@@ -136,6 +137,31 @@ module.exports = {
         resp.status(404).json('order does not exist');
       }
     } catch (error) {
+      resp.status(404).send('order does not exist');
+    }
+  },
+
+  deleteOrders: async (req, resp, next) => {
+    // resp.send("DELETE NOT IMPLEMENTED")
+    // console.log(req.params);
+    try {
+      const db = await connect();
+      const orderCollection = db.collection('order');
+      const { orderId } = req.params;
+      // console.log(orderId);
+      let orderFind = '';
+      if (ObjectId.isValid(orderId)) {
+        orderFind = await orderCollection.findOneAndDelete({ _id: new ObjectId(orderId) });
+      } else {
+        orderFind = await orderCollection.findOneAndDelete({ name: { $regex: orderId, $options: 'i' } });
+      }
+      if (!orderFind) {
+        resp.status(404).json('order not found');
+      } else {
+        resp.status(200).json(orderFind);
+      }
+    } catch (error) {
+      console.error(error);
       resp.status(404).send('order does not exist');
     }
   }
