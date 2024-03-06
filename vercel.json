@@ -3,7 +3,7 @@
     "rewrites": [
         {
             "source": "/(.*)",
-            "destination": "/$1"
+            "destination": "/Laboratoria-burger-queen-api/$1"
         }
     ]
 }
