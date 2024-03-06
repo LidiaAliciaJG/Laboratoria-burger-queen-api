@@ -12,6 +12,11 @@ const app = express();
 app.set('config', config);
 app.set('pkg', pkg);
 
+app.use((req, res, next) => {
+  console.log('Request URL:', req.url);
+  next();
+});
+
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
