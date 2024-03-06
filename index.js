@@ -12,10 +12,7 @@ const app = express();
 app.set('config', config);
 app.set('pkg', pkg);
 
-app.use((req, res, next) => {
-  console.log('Request URL:', req.url);
-  next();
-});
+app.get("/", (req, res) => res.send("Express on Vercel"));
 
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }));
